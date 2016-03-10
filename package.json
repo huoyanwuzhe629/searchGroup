@@ -1,0 +1,11 @@
+{
+  "name": "searchGroup",
+  "version": "1.0.0",
+  "description": "a mvc program for new member in bizdev-fe",
+  "author": "Guo meiqing",
+  "contributors": "Guo meiqing",
+  "devDependencies": {   
+    "http-server": "~0.5.3"
+  },
+  "license": "ISC"
+}
