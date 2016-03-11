@@ -1,21 +1,16 @@
-define(['jquery', 'underscore', 'backbone', '../model/CpcGroup', 'bizUi', 'mustache', 'text!tpl/CpcGroup.tpl'], function($, _, Backbone, Item, bizui, Mustache, tpl) {
+define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGroup.tpl'], function($, _, Backbone, bizui, Mustache, tpl) {
     var FilterView = Backbone.View.extend({
         template: tpl,
         events: {
             'click input:radio': 'selectArea',
-            'click input:checkbox': 'selectCity',
-            'keyup input': 'setParams',
             'click button#search': 'search',
             'click button#clear': 'clear',
-            'change select': 'selectChannel'
         },
         initialize: function() {
             var self = this;
             Mustache.parse(self.template);
-            // self.model = new Item();
-            // self.model.on('change', self.render);
             self.model.bind('change:params', self.render, self);
-            self.model.bind('remove', self.unrender, self);
+            self.model.bind('destroy', self.unrender, self);
             $.ajax({
                 type: 'GET',
                 url: '/mock/data.json',
@@ -30,68 +25,58 @@ define(['jquery', 'underscore', 'backbone', '../model/CpcGroup', 'bizUi', 'musta
         render: function() {
             var self = this;
             $(self.el).html(Mustache.render(self.template, this.model.toJSON()));
-            $(':radio').bizRadio();
+            $('input:text', self.el).bizInput();
+            $(':radio', self.el).bizRadio();
             $('input:checkbox', self.el).bizCheckbox();
-            // $('#channel').val(self.model.get('params').channel);
-            $('.calendar').bizCalendar({
-                onChange: function(e) {
-                    self.model.set({
-                        beginTime: $('#beginTime').val(),
-                        endTime: $('#endTime').val()
-                    });
-                }
-            });
+            $('#channel').val(self.model.get('params').channel);
+            $('.calendar').bizCalendar();
             $('.control button').bizButton();
-
-            // table = self.initTable(self.model.get('result').slice(0, 10));
-            // var resultNum = self.model.get('result').length;
-            // self.initPage(resultNum, table);
             return this;
+        },
+        unrender: function() {
+            var self = this;
+            self.el.remove();
         },
         selectArea: function(e) {
             var self = this;
             var areaType = $(e.target).val();
-            var areaDict = {
-                allArea: ['beijing', 'tianjin'],
-                selectArea: []
-            };
-            var params = JSON.parse(JSON.stringify(self.model.get('params')));
-            params.area = areaType;
-            params.city = areaDict[areaType];
-            self.model.set({
-                params: params
-            });
-            console.log(self.model);
+            if (areaType === 'allArea') {
+                $('input:checkbox', self.el).bizCheckbox('disable');
+                $('input:checkbox', self.el).bizCheckbox('check');
+            } else {
+                $('input:checkbox', self.el).bizCheckbox('enable');
+                $('input:checkbox', self.el).bizCheckbox('uncheck');
+            }
         },
-        selectCity: function(e) {
+        setParams: function() {
             var self = this;
+            var areaType = '';
+            $('input:radio', self.el).each(function(index, el) {
+                if ($(el).prop('checked')) {
+                    areaType = $(el).val();
+                } 
+            });
             var cityList = [];
             $('input:checkbox', self.el).each(function(index, el) {
                 if ($(el).prop('checked')) {
                     cityList.push($(this).val());
                 }
             });
-            var params = JSON.parse(JSON.stringify(self.model.get('params')));
-            params.city = cityList;
-            self.model.set({ params: params });
-        },
-        selectChannel: function() {
-            var self = this;
-            var params = JSON.parse(JSON.stringify(self.model.get('params')));
-            params.channel = $('#channel').val();
-            self.model.set({ params: params });
-        },
-        setParams: function() {
-            var self = this;
-            var params = JSON.parse(JSON.stringify(self.model.get('params')));
-            params.groupName = $('#groupName').val();
-            params.priceFrom = $('#priceFrom').val();
-            params.priceTo = $('#priceTo').val();
+            var params = {
+                groupName: $('#groupName').val(),
+                area: areaType,
+                city: cityList,
+                channel: $('#channel').val(),
+                beginTime: $('#beginTime').val(),
+                endTime: $('#endTime').val(),
+                priceFrom: $('#priceFrom').val(),
+                priceTo: $('#priceTo').val(),
+            };
             self.model.set({ params: params });
         },
         search: function() {
             var self = this;
-
+            self.setParams();
             if (!self.model.isValid()) {
                 alert(self.model.validationError);
             }
@@ -110,7 +95,6 @@ define(['jquery', 'underscore', 'backbone', '../model/CpcGroup', 'bizUi', 'musta
                             flag = false;
                         }
                     }
-
                     var regionDict = {
                         '01': ['tianjin'],
                         '10': ['beijing'],
@@ -131,7 +115,6 @@ define(['jquery', 'underscore', 'backbone', '../model/CpcGroup', 'bizUi', 'musta
                             flag = false;
                         }
                     }
-
                     if (self.model.get('params').beginTime !== '') {
                         var filterDate = Date.parse(new Date(self.model.get('params').beginTime));
                         var resultDate = Date.parse(new Date(item.startDate));
@@ -163,7 +146,8 @@ define(['jquery', 'underscore', 'backbone', '../model/CpcGroup', 'bizUi', 'musta
         },
         clear: function() {
             var self = this;
-            self.initialize();
+            var paramsDefault = JSON.parse(JSON.stringify(self.model.defaults.params));
+            self.model.set({ params: paramsDefault });
         }
     });
 
@@ -173,6 +157,7 @@ define(['jquery', 'underscore', 'backbone', '../model/CpcGroup', 'bizUi', 'musta
         initialize: function() {
             var self = this;
             self.model.bind('change:result', self.render, self);
+            self.model.bind('destroy', self.unrender, self);
             // self.render();
         },
         initTable: function(data) {
@@ -200,7 +185,6 @@ define(['jquery', 'underscore', 'backbone', '../model/CpcGroup', 'bizUi', 'musta
             }, {
                 field: 'channel',
                 title: '频道',
-                // currentSort: 'des',
                 align: 'left',
                 content: function(item, index, field) {
                     return item.channel;
@@ -208,9 +192,7 @@ define(['jquery', 'underscore', 'backbone', '../model/CpcGroup', 'bizUi', 'musta
             }, {
                 field: 'startDate',
                 title: '开始时间',
-                // editable: true,
                 sortable: true,
-                // currentSort: 'des',
                 align: 'right',
                 content: function(item, index, field) {
                     return item.startDate;
@@ -321,13 +303,16 @@ define(['jquery', 'underscore', 'backbone', '../model/CpcGroup', 'bizUi', 'musta
             var resultNum = self.model.get('result').length;
             self.initPage(resultNum, table);
             return this;
+        },
+        unrender: function() {
+            var self = this;
+            self.el.remove();
         }
     });
     var CpcView = Backbone.View.extend({
         el: $('main'),
         initialize: function () {
             var self = this;
-            self.model = new Item();
             self.filterView = new FilterView({model: self.model});
             self.resultView = new ResultView({model: self.model});
             self.render();
