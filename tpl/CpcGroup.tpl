@@ -16,7 +16,8 @@
     <div>
         <div style="display: inline-block;">
             <label for="channel">频&nbsp;&nbsp;&nbsp;道：</label>
-            <select id="channel" style="margin:10px;width: 173px;height: 25px" value="{{params.channel}}">
+            <select id="channel" style="margin:10px;width: 163px;height: 25px" value="{{params.channel}}">
+                <option value=""></option>
                 <option value="shoppingSearch">购物搜索</option>
                 <option value="dsp">dsp</option>
                 <option value="sohu">搜狐微门户</option>
@@ -34,9 +35,9 @@
     <div>
         <div style="display: inline-block;;">
             <label for="groupPrice">组出价：</label>
-            <input type="text" name="groupPrice" id="priceFrom" style="margin:10px;width: 65px;height: 25px" value="{{params.priceFrom}}">
+            <input type="text" name="groupPrice" id="priceFrom" style="margin:10px;width: 62px;height: 25px" value="{{params.priceFrom}}">
             <span>--</span>
-            <input type="text" name="groupPrice" id="priceTo" style="margin:10px;width: 65px;height: 25px" value="{{params.priceTo}}">
+            <input type="text" name="groupPrice" id="priceTo" style="margin:10px;width: 62px;height: 25px" value="{{params.priceTo}}">
         </div>
     </div>
     <div class="control">

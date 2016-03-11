@@ -18,7 +18,7 @@ define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGr
             $('input:text', self.el).bizInput();
             $(':radio', self.el).bizRadio();
             $('input:checkbox', self.el).bizCheckbox();
-            $('#channel').val(self.model.get('params').channel);
+            $('#channel', self.el).bizSelect();
             $('.calendar', self.el).bizCalendar();
             $('.control button', self.el).bizButton();
             return this;
@@ -31,9 +31,11 @@ define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGr
             var self = this;
             var areaType = $(e.target).val();
             if (areaType === 'allArea') {
+                $('#selectArea').bizRadio('uncheck');
                 $('input:checkbox', self.el).bizCheckbox('disable');
                 $('input:checkbox', self.el).bizCheckbox('check');
             } else {
+                $('#allArea').bizRadio('uncheck');
                 $('input:checkbox', self.el).bizCheckbox('enable');
                 $('input:checkbox', self.el).bizCheckbox('uncheck');
             }
@@ -248,7 +250,6 @@ define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGr
         render: function() {
             var self = this;
             $('#filterContext', self.el).html(self.filterView.render().el);
-            $('#channel').val(self.model.get('params').channel);
             $('#resultList', self.el).html(self.resultView.render().el);
             return this;
         },
