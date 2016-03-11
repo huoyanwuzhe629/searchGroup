@@ -1,7 +1,9 @@
 define(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
     var ListController = Backbone.Router.extend({
         routes: {
-            'clear/:id': 'clear',
+            'remove/:id': 'remove',
+            'search/:channel': 'search',
+            'clear': 'clear',
         },
 
     });

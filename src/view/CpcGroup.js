@@ -11,16 +11,6 @@ define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGr
             Mustache.parse(self.template);
             self.model.bind('change:params', self.render, self);
             self.model.bind('destroy', self.unrender, self);
-            $.ajax({
-                type: 'GET',
-                url: '/mock/data.json',
-                data: '233',
-                dataType: 'json',
-                success: function(data) {
-                    self.model.set({ result: data.data });
-                    self.render();
-                }
-            });
         },
         render: function() {
             var self = this;
@@ -29,13 +19,13 @@ define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGr
             $(':radio', self.el).bizRadio();
             $('input:checkbox', self.el).bizCheckbox();
             $('#channel').val(self.model.get('params').channel);
-            $('.calendar').bizCalendar();
-            $('.control button').bizButton();
+            $('.calendar', self.el).bizCalendar();
+            $('.control button', self.el).bizButton();
             return this;
         },
         unrender: function() {
             var self = this;
-            self.el.remove();
+            self.remove();
         },
         selectArea: function(e) {
             var self = this;
@@ -54,7 +44,7 @@ define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGr
             $('input:radio', self.el).each(function(index, el) {
                 if ($(el).prop('checked')) {
                     areaType = $(el).val();
-                } 
+                }
             });
             var cityList = [];
             $('input:checkbox', self.el).each(function(index, el) {
@@ -80,74 +70,13 @@ define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGr
             if (!self.model.isValid()) {
                 alert(self.model.validationError);
             }
-            $.when($.ajax({
-                type: 'GET',
-                url: '/mock/data.json',
-                data: '',
-                dataType: 'json',
-
-            })).done(function(data) {
-                var filterList = data.data;
-                filterList = _.filter(filterList, function(item) {
-                    var flag = true;
-                    if (self.model.get('params').groupName !== '') {
-                        if (item.groupName.indexOf(self.model.get('params').groupName) === -1) {
-                            flag = false;
-                        }
-                    }
-                    var regionDict = {
-                        '01': ['tianjin'],
-                        '10': ['beijing'],
-                        '11': ['beijing', 'tianjin']
-                    };
-                    if (self.model.get('params').city.toString().indexOf(regionDict[item.region].toString()) === -1) {
-                        flag = false;
-                    }
-                    var channelDict = {
-                        shoppingSearch: '购物搜索',
-                        dsp: 'dsp',
-                        sohu: '搜狐微门户',
-                        qqNav: 'qq导航页',
-                        sogouPhoneticize: '搜狗拼音'
-                    }
-                    if (self.model.get('params').channel) {
-                        if (item.channel !== channelDict[self.model.get('params').channel]) {
-                            flag = false;
-                        }
-                    }
-                    if (self.model.get('params').beginTime !== '') {
-                        var filterDate = Date.parse(new Date(self.model.get('params').beginTime));
-                        var resultDate = Date.parse(new Date(item.startDate));
-                        if (filterDate > resultDate) {
-                            flag = false;
-                        }
-                    }
-                    if (self.model.get('params').endTime !== '') {
-                        var filterDate = Date.parse(new Date(self.model.get('params').endTime));
-                        var resultDate = Date.parse(new Date(item.endDate));
-                        if (filterDate < resultDate) {
-                            flag = false;
-                        }
-                    }
-                    if (self.model.get('params').priceFrom !== '') {
-                        if (item.price < self.model.get('params').priceFrom) {
-                            flag = false;
-                        }
-                    }
-                    if (self.model.get('params').priceTo !== '') {
-                        if (item.price > self.model.get('params').priceTo) {
-                            flag = false;
-                        }
-                    }
-                    return flag;
-                });
-                self.model.set({ result: filterList });
-            });
+            self.model.filter();
         },
         clear: function() {
             var self = this;
             var paramsDefault = JSON.parse(JSON.stringify(self.model.defaults.params));
             self.model.set({ params: paramsDefault });
+            self.render();
         }
     });
 
@@ -158,7 +87,6 @@ define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGr
             var self = this;
             self.model.bind('change:result', self.render, self);
             self.model.bind('destroy', self.unrender, self);
-            // self.render();
         },
         initTable: function(data) {
             var self = this;
@@ -306,23 +234,23 @@ define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGr
         },
         unrender: function() {
             var self = this;
-            self.el.remove();
+            self.remove();
         }
     });
     var CpcView = Backbone.View.extend({
         el: $('main'),
-        initialize: function () {
+        initialize: function() {
             var self = this;
-            self.filterView = new FilterView({model: self.model});
-            self.resultView = new ResultView({model: self.model});
+            self.filterView = new FilterView({ model: self.model });
+            self.resultView = new ResultView({ model: self.model });
             self.render();
         },
-        render: function () {
+        render: function() {
             var self = this;
             $('#filterContext', self.el).html(self.filterView.render().el);
+            $('#channel').val(self.model.get('params').channel);
             $('#resultList', self.el).html(self.resultView.render().el);
             return this;
-
         },
     });
     return CpcView;
