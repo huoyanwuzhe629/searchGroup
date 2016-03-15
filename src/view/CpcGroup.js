@@ -14,11 +14,12 @@ define(['jquery', 'underscore', 'backbone', 'bizUi', 'mustache', 'text!tpl/CpcGr
         },
         render: function() {
             var self = this;
-            $(self.el).html(Mustache.render(self.template, this.model.toJSON()));
+            $(self.el).html(Mustache.render(self.template, self.model.toJSON()));
             $('input:text', self.el).bizInput();
             $(':radio', self.el).bizRadio();
             $('input:checkbox', self.el).bizCheckbox();
             $('#channel', self.el).bizSelect();
+            $('#channel', self.el).bizSelect('val', self.model.get('params').channel);
             $('.calendar', self.el).bizCalendar();
             $('.control button', self.el).bizButton();
             return this;

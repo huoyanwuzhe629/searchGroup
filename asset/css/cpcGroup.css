@@ -14,7 +14,7 @@ header h1 {
     height: 60px;
     line-height: 60px
 }
-#logo {
+/*#logo {
     float: left;
     width: 40px;
     height: 40px;
@@ -36,7 +36,7 @@ header h1 {
     min-height: 500px;
     padding-bottom: 30px;
     border-left: 1px #e2e2e2 solid
-}
+}*/
 footer {
     color: #333;
     height: 40px;
@@ -94,6 +94,6 @@ footer a {
     width: 400px;
     height: 200px
 }
-.selectBox {
-    margin-left: 10px
+.filter-line {
+    margin: 10px 0 10px 0;
 }
