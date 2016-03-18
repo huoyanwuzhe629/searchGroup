@@ -2,8 +2,7 @@ define(['../src/view/CpcGroup','../src/model/CpcGroup', '../src/Router','backbon
     var cpcModel = new CpcModel();
     var cpcView = new CpcView({model: cpcModel});
     var cpcRoute = new CpcRoute;
-    cpcRoute.on('route:remove', function(id) {
-        console.log(id);
+    cpcRoute.on('route:remove', function() {
         cpcView.model.destroy();
     });
     cpcRoute.on('route:search', function(channel) {
